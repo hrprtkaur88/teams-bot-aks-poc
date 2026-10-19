@@ -2,7 +2,6 @@ param location string
 param namePrefix string
 param acrResourceId string
 param logAnalyticsWorkspaceResourceId string
-param subnetResourceId string
 
 resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
   name: '${namePrefix}-aks'
@@ -16,16 +15,15 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
     agentPoolProfiles: [
       {
         name: 'system'
-        count: 2
+        count: 1
         vmSize: 'Standard_D2s_v5'
         osType: 'Linux'
         osSKU: 'Ubuntu'
         mode: 'System'
-        vnetSubnetID: subnetResourceId
       }
     ]
     networkProfile: {
-      networkPlugin: 'azure'
+      networkPlugin: 'kubenet'
       loadBalancerSku: 'standard'
       outboundType: 'loadBalancer'
     }

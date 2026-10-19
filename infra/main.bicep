@@ -80,7 +80,6 @@ module aks 'aks.bicep' = {
     namePrefix: namePrefix
     acrResourceId: acr.outputs.acrResourceId
     logAnalyticsWorkspaceResourceId: loganalytics.outputs.workspaceResourceId
-    subnetResourceId: networking.outputs.aksSubnetResourceId
   }
 }
 
@@ -106,4 +105,3 @@ output botEndpoint string = bot.outputs.messagingEndpoint
 output applicationInsightsName string = appinsights.outputs.applicationInsightsName
 output applicationInsightsConnectionString string = appinsights.outputs.connectionString
 output managedIdentityClientId string = identity.outputs.clientId
-
