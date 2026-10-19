@@ -17,7 +17,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
       {
         name: 'system'
         count: 2
-        vmSize: 'Standard_DS2_v2'
+        vmSize: 'Standard_D2s_v5'
         osType: 'Linux'
         osSKU: 'Ubuntu'
         mode: 'System'
@@ -55,4 +55,3 @@ resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 output aksName string = aks.name
 output aksId string = aks.id
-

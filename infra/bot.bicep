@@ -12,18 +12,13 @@ resource bot 'Microsoft.BotService/botServices@2022-09-15' = {
   sku: {
     name: 'F0'
   }
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${userAssignedIdentityResourceId}': {}
-    }
-  }
   properties: {
     displayName: '${namePrefix}-teams-bot'
     endpoint: botEndpoint
     msaAppType: 'UserAssignedMSI'
     msaAppId: userAssignedIdentityClientId
     msaAppTenantId: tenantId
+    msaAppMSIResourceId: userAssignedIdentityResourceId
     publicNetworkAccess: 'Enabled'
     isCmekEnabled: false
   }
@@ -31,4 +26,3 @@ resource bot 'Microsoft.BotService/botServices@2022-09-15' = {
 
 output botName string = bot.name
 output messagingEndpoint string = bot.properties.endpoint
-
