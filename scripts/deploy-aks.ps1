@@ -11,7 +11,8 @@ $ErrorActionPreference = "Stop"
 
 $aksName = az aks list -g $ResourceGroupName --query "[0].name" -o tsv
 $acrLoginServer = az acr list -g $ResourceGroupName --query "[0].loginServer" -o tsv
-$bot = az bot list -g $ResourceGroupName --query "[0]" -o json | ConvertFrom-Json
+$botName = az resource list -g $ResourceGroupName --resource-type Microsoft.BotService/botServices --query "[0].name" -o tsv
+$bot = az resource show -g $ResourceGroupName -n $botName --resource-type Microsoft.BotService/botServices -o json | ConvertFrom-Json
 $identityClientId = az identity list -g $ResourceGroupName --query "[0].clientId" -o tsv
 $keyVaultName = az keyvault list -g $ResourceGroupName --query "[0].name" -o tsv
 if (-not $TenantId) {
@@ -51,4 +52,3 @@ if ($PublicBotHost) {
 kubectl set env deployment/teams-bot -n teams-bot-poc FAILURE_MODE=$FailureMode
 kubectl rollout status deployment/teams-bot -n teams-bot-poc --timeout=180s
 kubectl get all -n teams-bot-poc
-
