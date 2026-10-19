@@ -20,7 +20,7 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
   MicrosoftAppId: config.microsoftAppId,
   MicrosoftAppPassword: config.microsoftAppPassword,
   MicrosoftAppTenantId: config.microsoftAppTenantId,
-  MicrosoftAppType: config.microsoftAppId ? "SingleTenant" : undefined
+  MicrosoftAppType: config.microsoftAppType || undefined
 });
 
 const adapter = new CloudAdapter(botFrameworkAuthentication);
