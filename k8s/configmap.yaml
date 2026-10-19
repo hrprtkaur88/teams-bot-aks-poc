@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: teams-bot-config
+  namespace: teams-bot-poc
+data:
+  FAILURE_MODE: "none"
+  PORT: "3978"
+

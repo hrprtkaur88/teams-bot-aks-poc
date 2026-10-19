@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+*.zip
+*.tgz
+infra/*.local.json
+scripts/*.local.ps1
+teams-app/package/
+_outputs/
+

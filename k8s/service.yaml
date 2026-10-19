@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: teams-bot
+  namespace: teams-bot-poc
+spec:
+  type: LoadBalancer
+  selector:
+    app: teams-bot
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3978
+

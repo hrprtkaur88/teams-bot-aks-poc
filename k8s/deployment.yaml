@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teams-bot
+  namespace: teams-bot-poc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: teams-bot
+  template:
+    metadata:
+      labels:
+        app: teams-bot
+    spec:
+      containers:
+        - name: teams-bot
+          image: <acr-login-server>/teams-bot-aks-failure-poc:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3978
+          envFrom:
+            - configMapRef:
+                name: teams-bot-config
+          env:
+            - name: MicrosoftAppId
+              value: "<bot-app-id>"
+            - name: MicrosoftAppTenantId
+              value: "<tenant-id>"
+            - name: MicrosoftAppPassword
+              valueFrom:
+                secretKeyRef:
+                  name: teams-bot-secrets
+                  key: MicrosoftAppPassword
+                  optional: true
+            - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: teams-bot-secrets
+                  key: APPLICATIONINSIGHTS_CONNECTION_STRING
+                  optional: true
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 3978
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3978
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+

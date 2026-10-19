@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.17",
+  "version": "1.0.0",
+  "id": "<teams-app-id>",
+  "packageName": "com.contoso.teamsbotakspoc",
+  "developer": {
+    "name": "POC",
+    "websiteUrl": "https://example.com",
+    "privacyUrl": "https://example.com/privacy",
+    "termsOfUseUrl": "https://example.com/terms"
+  },
+  "name": {
+    "short": "AKS Bot POC",
+    "full": "Teams Bot AKS Failure POC"
+  },
+  "description": {
+    "short": "POC bot for AKS failure diagnostics.",
+    "full": "A Teams bot POC that validates backend HTTP 500 and simulated ECONNRESET diagnostics on AKS."
+  },
+  "accentColor": "#6264A7",
+  "bots": [
+    {
+      "botId": "<bot-app-id>",
+      "scopes": ["personal", "team", "groupchat"],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["<public-bot-host>"]
+}
+
