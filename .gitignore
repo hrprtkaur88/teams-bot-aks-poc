@@ -7,7 +7,7 @@ dist/
 *.zip
 *.tgz
 infra/*.local.json
+infra/main.json
 scripts/*.local.ps1
 teams-app/package/
 _outputs/
-
