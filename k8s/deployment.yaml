@@ -29,6 +29,8 @@ spec:
               value: "<tenant-id>"
             - name: MicrosoftAppType
               value: "UserAssignedMSI"
+            - name: AZURE_CLIENT_ID
+              value: "<bot-app-id>"
             - name: MicrosoftAppPassword
               valueFrom:
                 secretKeyRef:
