@@ -1,5 +1,5 @@
 param(
-  [string]$RepoName = "teams-bot-aks-failure-poc",
+  [string]$RepoName = "teams-bot-aks-poc",
   [string]$Description = "POC for Teams bot HTTP 500 and ECONNRESET diagnostics on AKS."
 )
 
