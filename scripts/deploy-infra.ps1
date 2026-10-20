@@ -27,7 +27,11 @@ foreach ($provider in $providers) {
 }
 
 # Required for AKS standard-load-balancer public IPs in some subscriptions.
-az feature register --namespace Microsoft.Network --name AllowBringYourOwnPublicIpAddress 2>&1 | Out-Null
+try {
+  az feature register --namespace Microsoft.Network --name AllowBringYourOwnPublicIpAddress 2>$null
+} catch {
+  Write-Output "Feature registration warning (non-fatal): $($_.Exception.Message)"
+}
 az provider register --namespace Microsoft.Network | Out-Null
 
 az deployment sub create `

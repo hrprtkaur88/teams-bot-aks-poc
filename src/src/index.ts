@@ -36,7 +36,8 @@ const authConfig: AuthConfiguration = {
   tenantId: workloadIdentity.tenantId,
   federatedClientId: workloadIdentity.clientId,
   federatedTokenFile: workloadIdentity.federatedTokenFile,
-  authorityEndpoint: workloadIdentity.authorityHost
+  authorityEndpoint: workloadIdentity.authorityHost,
+  scopes: ["https://api.botframework.com/.default"]
 };
 
 const adapter = new CloudAdapter(authConfig);
