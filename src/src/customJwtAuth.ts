@@ -76,6 +76,16 @@ export function authorizeBotFrameworkJwt(expectedAudience: string) {
           iss: (decoded as jwt.JwtPayload)?.iss
         });
 
+        // CRITICAL: @microsoft/agents-hosting's CloudAdapter.process() reads
+        // the caller identity from request.user (JwtPayload). If this isn't
+        // set, the adapter silently falls back to an "anonymous identity"
+        // when building the ConnectorClient used for the OUTBOUND reply —
+        // which Bot Framework Connector then rejects with HTTP 401. This was
+        // the actual root cause of the outbound 401 seen in this POC: our
+        // custom validator was verifying the token correctly but never
+        // attaching it to request.user, so every reply went out unauthenticated.
+        (req as Request & { user?: jwt.JwtPayload }).user = decoded as jwt.JwtPayload;
+
         next();
       }
     );
