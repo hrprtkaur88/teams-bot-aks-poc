@@ -38,9 +38,9 @@ foreach ($file in $files) {
 
 kubectl apply -f "$work\namespace.yaml"
 kubectl apply -f "$work\configmap.yaml"
+kubectl apply -f "$work\service-account.yaml"
 kubectl create secret generic teams-bot-secrets `
   -n teams-bot-poc `
-  --from-literal=MicrosoftAppPassword="" `
   --from-literal=APPLICATIONINSIGHTS_CONNECTION_STRING="$(az monitor app-insights component show -g $ResourceGroupName --query connectionString -o tsv)" `
   --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f "$work\deployment.yaml"

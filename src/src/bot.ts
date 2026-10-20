@@ -1,44 +1,54 @@
-import { ActivityHandler, MessageFactory, TurnContext } from "botbuilder";
+import { ActivityTypes } from "@microsoft/agents-activity";
+import { AgentApplication, MessageFactory, MemoryStorage, TurnContext, TurnState } from "@microsoft/agents-hosting";
+import type { CloudAdapter } from "@microsoft/agents-hosting";
 import type { FailureMode } from "./config.js";
 import { applyAfterReceiveFailure, applyBeforeReplyFailure, applyReplyFailure } from "./failureModes.js";
 import { error, getCorrelationFields, info } from "./logging.js";
 
-export class FailurePocBot extends ActivityHandler {
-  public constructor(private readonly failureMode: FailureMode) {
-    super();
+// AgentApplication-based bot matching the architecture diagram:
+//   messaging pod -> CloudAdapter -> AgentApplication
+//     membersAdded -> greet
+//     message -> echo
+export function createAgentApplication(adapter: CloudAdapter, failureMode: FailureMode): AgentApplication<TurnState> {
+  const app = new AgentApplication<TurnState>({
+    adapter,
+    storage: new MemoryStorage()
+  });
 
-    this.onMessage(async (context, next) => {
-      const fields = getCorrelationFields(context, { failureMode: this.failureMode });
-      info("bot logic start", fields);
+  app.onConversationUpdate("membersAdded", async (context: TurnContext) => {
+    await sendInstrumentedReply(
+      context,
+      failureMode,
+      "POC bot installed. Send a message to test normal and failure modes."
+    );
+  });
 
-      applyAfterReceiveFailure(this.failureMode);
-      await applyBeforeReplyFailure(this.failureMode);
+  app.onActivity(ActivityTypes.Message, async (context: TurnContext) => {
+    const fields = getCorrelationFields(context, { failureMode });
+    info("bot logic start", fields);
 
-      const text = context.activity.text?.trim() || "empty message";
-      await this.sendInstrumentedReply(context, `POC bot received: ${text}`);
+    applyAfterReceiveFailure(failureMode);
+    await applyBeforeReplyFailure(failureMode);
 
-      info("bot logic end", fields);
-      await next();
-    });
+    const text = context.activity.text?.trim() || "empty message";
+    await sendInstrumentedReply(context, failureMode, `POC bot received: ${text}`);
 
-    this.onMembersAdded(async (context, next) => {
-      await this.sendInstrumentedReply(context, "POC bot installed. Send a message to test normal and failure modes.");
-      await next();
-    });
-  }
+    info("bot logic end", fields);
+  });
 
-  private async sendInstrumentedReply(context: TurnContext, text: string): Promise<void> {
-    const fields = getCorrelationFields(context, { failureMode: this.failureMode });
-    info("sendActivity start", fields);
-
-    try {
-      applyReplyFailure(this.failureMode);
-      await context.sendActivity(MessageFactory.text(text));
-      info("sendActivity end", fields);
-    } catch (err) {
-      error("sendActivity failed", err, fields);
-      throw err;
-    }
-  }
+  return app;
 }
 
+async function sendInstrumentedReply(context: TurnContext, failureMode: FailureMode, text: string): Promise<void> {
+  const fields = getCorrelationFields(context, { failureMode });
+  info("sendActivity start", fields);
+
+  try {
+    applyReplyFailure(failureMode);
+    await context.sendActivity(MessageFactory.text(text));
+    info("sendActivity end", fields);
+  } catch (err) {
+    error("sendActivity failed", err, fields);
+    throw err;
+  }
+}

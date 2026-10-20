@@ -6,12 +6,15 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    # Matches the architecture diagram: ingress path /messaging, no rewrite.
+    # The full path (including /messaging) is forwarded to the pod as-is,
+    # so the app itself serves routes under /messaging/*.
 spec:
   rules:
     - host: <public-bot-host>
       http:
         paths:
-          - path: /
+          - path: /messaging
             pathType: Prefix
             backend:
               service:

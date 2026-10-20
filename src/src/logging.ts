@@ -1,4 +1,4 @@
-import type { TurnContext } from "botbuilder";
+import type { TurnContext } from "@microsoft/agents-hosting";
 import { randomUUID } from "node:crypto";
 
 export type LogFields = Record<string, unknown>;

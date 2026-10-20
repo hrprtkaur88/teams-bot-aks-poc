@@ -12,6 +12,14 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-02-01' = {
   properties: {
     dnsPrefix: '${namePrefix}-aks'
     enableRBAC: true
+    oidcIssuerProfile: {
+      enabled: true
+    }
+    securityProfile: {
+      workloadIdentity: {
+        enabled: true
+      }
+    }
     agentPoolProfiles: [
       {
         name: 'system'
@@ -53,3 +61,4 @@ resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 output aksName string = aks.name
 output aksId string = aks.id
+output oidcIssuerUrl string = aks.properties.oidcIssuerProfile.issuerURL

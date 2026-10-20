@@ -4,7 +4,7 @@ metadata:
   name: teams-bot
   namespace: teams-bot-poc
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: teams-bot
@@ -12,7 +12,12 @@ spec:
     metadata:
       labels:
         app: teams-bot
+        # Required label for the Azure Workload Identity mutating webhook to
+        # inject AZURE_CLIENT_ID / AZURE_TENANT_ID / AZURE_FEDERATED_TOKEN_FILE
+        # / AZURE_AUTHORITY_HOST into this pod automatically.
+        azure.workload.identity/use: "true"
     spec:
+      serviceAccountName: teams-bot-workload-identity
       containers:
         - name: teams-bot
           image: <acr-login-server>/teams-bot-aks-failure-poc:latest
@@ -25,18 +30,6 @@ spec:
           env:
             - name: MicrosoftAppId
               value: "<bot-app-id>"
-            - name: MicrosoftAppTenantId
-              value: "<tenant-id>"
-            - name: MicrosoftAppType
-              value: "UserAssignedMSI"
-            - name: AZURE_CLIENT_ID
-              value: "<bot-app-id>"
-            - name: MicrosoftAppPassword
-              valueFrom:
-                secretKeyRef:
-                  name: teams-bot-secrets
-                  key: MicrosoftAppPassword
-                  optional: true
             - name: APPLICATIONINSIGHTS_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
@@ -53,13 +46,13 @@ spec:
                   fieldPath: spec.nodeName
           readinessProbe:
             httpGet:
-              path: /readyz
+              path: /messaging/healthz
               port: 3978
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /messaging/healthz
               port: 3978
             initialDelaySeconds: 20
             periodSeconds: 20

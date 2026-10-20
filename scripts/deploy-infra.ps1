@@ -1,8 +1,8 @@
 param(
   [Parameter(Mandatory = $true)][string]$SubscriptionId,
-  [string]$Location = "eastus",
-  [string]$ResourceGroupName = "rg-teams-bot-aks-poc",
-  [string]$NamePrefix = "tbakspoc",
+  [string]$Location = "westus2",
+  [string]$ResourceGroupName = "rg-teams-bot-pwc-poc",
+  [string]$NamePrefix = "tbpwcpoc",
   [string]$BotEndpointHost = "replace-after-ingress-is-known"
 )
 
@@ -17,12 +17,18 @@ $providers = @(
   "Microsoft.Insights",
   "Microsoft.KeyVault",
   "Microsoft.ManagedIdentity",
-  "Microsoft.Network"
+  "Microsoft.Network",
+  "Microsoft.OperationsManagement",
+  "Microsoft.OperationalInsights"
 )
 
 foreach ($provider in $providers) {
   az provider register --namespace $provider | Out-Null
 }
+
+# Required for AKS standard-load-balancer public IPs in some subscriptions.
+az feature register --namespace Microsoft.Network --name AllowBringYourOwnPublicIpAddress 2>&1 | Out-Null
+az provider register --namespace Microsoft.Network | Out-Null
 
 az deployment sub create `
   --name "teams-bot-aks-poc-$((Get-Date).ToString('yyyyMMddHHmmss'))" `

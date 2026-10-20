@@ -4,13 +4,19 @@ targetScope = 'subscription'
 param resourceGroupName string
 
 @description('Azure region for all resources.')
-param location string = 'eastus'
+param location string = 'westus2'
 
 @description('Globally unique-ish prefix, lowercase alphanumeric only.')
 param namePrefix string
 
 @description('Public DNS host for the AKS ingress/load balancer. Update after ingress is known.')
 param botEndpointHost string = 'pending.example.com'
+
+@description('Kubernetes namespace of the bot workload, used for the federated credential subject.')
+param k8sNamespace string = 'teams-bot-poc'
+
+@description('Kubernetes ServiceAccount name annotated for workload identity.')
+param k8sServiceAccountName string = 'teams-bot-workload-identity'
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: resourceGroupName
@@ -96,6 +102,17 @@ module bot 'bot.bicep' = {
   }
 }
 
+module federatedCredential 'federatedCredential.bicep' = {
+  name: 'federatedCredential'
+  scope: rg
+  params: {
+    identityName: identity.outputs.name
+    aksOidcIssuerUrl: aks.outputs.oidcIssuerUrl
+    k8sNamespace: k8sNamespace
+    k8sServiceAccountName: k8sServiceAccountName
+  }
+}
+
 output resourceGroup string = rg.name
 output aksName string = aks.outputs.aksName
 output acrName string = acr.outputs.acrName
@@ -105,3 +122,6 @@ output botEndpoint string = bot.outputs.messagingEndpoint
 output applicationInsightsName string = appinsights.outputs.applicationInsightsName
 output applicationInsightsConnectionString string = appinsights.outputs.connectionString
 output managedIdentityClientId string = identity.outputs.clientId
+output aksOidcIssuerUrl string = aks.outputs.oidcIssuerUrl
+output k8sNamespace string = k8sNamespace
+output k8sServiceAccountName string = k8sServiceAccountName
